@@ -1,0 +1,30 @@
+.BrowseCards {
+    width: auto;
+    height: 90%;
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.CardButton {
+    align-self: center;
+    margin: 10px;
+}
+
+.ProfileCard {
+    transform: translateY(0%);
+    transition: 0s ease;
+}
+
+.ProfileCard.liked {
+    transform: translateY(-100%);
+    transition: transform 0.5s ease;
+}
+
+.ProfileCard.disliked {
+    transform: translateY(100%);
+    transition: transform 0.5s ease;
+}
+
+
+
