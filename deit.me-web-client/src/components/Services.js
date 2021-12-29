@@ -8,10 +8,10 @@ async function makeRequest(endpoint, method = "GET", data = undefined, key = und
       headers.append('Authorization', `Bearer ${key}`);
     }
     const url = API_URL + endpoint;
-    const response = await fetch(url, { method, body: data && JSON.stringify(data) })
+    const response = await fetch(url, { headers, method, body: data && JSON.stringify(data) })
     if(response.status === 200){
-      return await response.json();
-    }else {
+      return response.json();
+    } else {
       return false;
     }
   } catch (error) {
@@ -26,6 +26,7 @@ class UserService {
     const res = await makeRequest('/auth/signin', 'POST', { email, password });
     if(res) {
       localStorage.setItem('user', JSON.stringify(res));
+      return true
     }else {
       return false;
     }
@@ -41,4 +42,18 @@ class UserService {
 
 }
 
+class HobbyService {
+  contructor(){ }
+
+  async getAll() {
+    const res = await makeRequest('/api/hobby', 'GET');
+    if (res) {
+      return JSON.stringify(res)
+    } else {
+      return false;
+    }
+  }
+}
+
+export const hobbyService = new HobbyService();
 export const userService = new UserService();

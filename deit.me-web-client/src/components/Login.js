@@ -1,36 +1,67 @@
 import React, {useState} from 'react'
 import { Form, Button } from 'react-bootstrap'
 import { userService } from './Services';
+import { useNavigate, Navigate } from "react-router-dom";
 
 export const Login = () => {
+  const history = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(false);
 
-  function handleLogin() {
-    userService.login(email, password)
+  const goToRegister = () => { 
+    history("/register");
   }
-  return (
-    <div>
-      <Form>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control type="email" placeholder="Enter email" value={email} onChange={(e)=> setEmail(e.target.value) }/>
-          <Form.Text className="text-muted">
-            We'll never share your email with anyone else.
-          </Form.Text>
-        </Form.Group>
 
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>Password</Form.Label>
-          <Form.Control type="password" placeholder="Password" value={password} onChange={(e)=> setPassword(e.target.value) }/>
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicCheckbox">
-          <Form.Check type="checkbox" label="Check me out" />
-        </Form.Group>
-        <Button variant="primary" type="submit" onClick={handleLogin(email, password)}>
-          Submit
-        </Button>
-      </Form>
-    </div>
-  )
+  const handleLogin = async() => {
+    var t = await userService.login(email, password)
+    if (email === '' || password === '' || t === false) {
+      setError(true);
+    } else {
+      setError(false);
+      history("/", {replace: true})
+    }
+  }
+
+  const errorMessage = () => {
+    return (
+      <div
+        className="error"
+        style={{
+          display: error ? '' : 'none',
+        }}>
+        <h1>Unsuccessfull login!</h1>
+      </div>
+    );
+  };
+
+  if (localStorage.getItem('user')) {
+    return <Navigate to='/' />
+  } else {
+    return (
+      <div>
+        <div className="messages">
+        {errorMessage()}
+      </div>
+        <Form>
+          <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label>Email address</Form.Label>
+            <Form.Control type="email" placeholder="Enter email" value={email} onChange={(e)=> setEmail(e.target.value) }/>
+            <Form.Text className="text-muted">
+              We'll never share your email with anyone else.
+            </Form.Text>
+          </Form.Group>
+  
+          <Form.Group className="mb-3" controlId="formBasicPassword">
+            <Form.Label>Password</Form.Label>
+            <Form.Control type="password" placeholder="Password" value={password} onChange={(e)=> setPassword(e.target.value) }/>
+          </Form.Group>
+          <Button variant="primary" onClick={handleLogin}>
+            Login
+          </Button>
+        </Form>
+        <div>You don't have an account yet? <button onClick={goToRegister}>Signup now!</button></div>
+      </div>
+    )
+  }
 }
