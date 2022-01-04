@@ -27,13 +27,19 @@ class UserService {
     if(res) {
       localStorage.setItem('user', JSON.stringify(res));
       return true
-    }else {
+    } else {
       return false;
     }
   }
 
-  async register(){
-
+  async register(user){
+    const res = await makeRequest('/auth/signup', 'POST', user);
+    console.log(user)
+    if(res) {
+      return true
+    } else {
+      return false;
+    }
   }
 
   async getUserInfo() {

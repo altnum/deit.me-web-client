@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import Input from './Input.js'
 import Button from './Button'
-import { Navigate } from "react-router-dom";
-import { userService, hobbyService } from './Services.js';
+import { useNavigate, Navigate } from "react-router-dom";
+import { hobbyService, userService } from './Services.js';
 
 export const Register = () => {
+  const history = useNavigate();
+  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [gender, setGender] = useState('');
   const [preference, setPreference] = useState('');
   const [hobbies, setHobbies] = useState([]);
+  const [error, setError] = useState(false);
   const hobbyMap = new Map();
   const chosenHobbies = new Map();
 
@@ -16,14 +23,14 @@ export const Register = () => {
   }, [])
 
   const handleHobbyCheckbox = (checked) => {
-    if (!chosenHobbies.get(checked) && chosenHobbies.get(checked) != 0) {
+    if (!chosenHobbies.get(checked) && chosenHobbies.get(checked) !== 0) {
       chosenHobbies.set(checked, 0)
       return;
     }
     
     chosenHobbies.set(checked, chosenHobbies.get(checked) + 1)
     
-    if (chosenHobbies.get(checked) % 2 != 0) {
+    if (chosenHobbies.get(checked) % 2 !== 0) {
       chosenHobbies.delete(checked)
     }
   }; 
@@ -31,19 +38,20 @@ export const Register = () => {
   const printHobbies = () => {
     const hobbiesDivs = [];
     for (let i = 0; i < hobbies.length; i++) {
-      console.log(hobbies[i].hobby)
       hobbyMap.set(hobbies[i].hobby, hobbies[i].id)
       hobbiesDivs.push(
-        <div>
-          <input
+        <tr>
+          <td><input
           type="checkbox"
-          id="topping"
-          name="topping"
+          id="hobbie"
+          name="hobbie"
           value={hobbies[i].hobby}
           onChange={(e)=> handleHobbyCheckbox(e.target.value)}
           />
-          {hobbies[i].hobby}
-        </div>)
+          </td>
+          <td>{hobbies[i].hobby}</td>
+        </tr>
+      )
     }
     return hobbiesDivs
   }
@@ -53,23 +61,47 @@ export const Register = () => {
     setHobbies(JSON.parse(hobbiesArr))
   }
 
-  const sendRequest = () => {
-    var _hobbies = []
+  const sendRequest = async() => {
+    var _hobbies = new Map;
     console.log('request sent')
     chosenHobbies.forEach((value, key) => {
-      console.log(hobbyMap.get(key))
-      console.log(key)
-      var hobby = {
-        "id": hobbyMap.get(key),
-        "hobby": key
-      }
-      _hobbies.push(hobby)
+      _hobbies.set(hobbyMap.get(key), key)
     })
-    console.log(_hobbies)
+
+    var user = {
+      "email": email,
+      "password": password,
+      "firstName": firstName,
+      "lastName": lastName,
+      "phoneNumber": phoneNumber,
+      "preference": preference,
+      "gender": gender,
+      "hobbies": _hobbies
+
+    }
+
+    var t = await userService.register(user);
+    if (t === false) {
+      setError(true);
+    } else {
+      setError(false);
+      history("/login", {replace: true})
+    }
   }
 
+  const errorMessage = () => {
+    return (
+      <div
+        className="error"
+        style={{
+          display: error ? '' : 'none',
+        }}>
+        <h1>Unsuccessfull register!</h1>
+      </div>
+    );
+  };
+
   const checkGender = (e) => {
-    console.log(gender)
     if (e === gender) {
       return true;
     } 
@@ -78,7 +110,6 @@ export const Register = () => {
   }
 
   const checkPreference = (e) => {
-    console.log(preference)
     if (e === preference) {
       return true;
     } 
@@ -91,20 +122,19 @@ export const Register = () => {
   } else {
   return (
     <div>
+      <div className="messages">
+          {errorMessage()}
+      </div>
       <div>First Name:</div>
-      <Input />
+      <Input value={firstName} onChange={(e)=> setFirstName(e.target.value)}/>
       <div>Last Name:</div>
-      <Input />
+      <Input value={lastName} onChange={(e)=> setLastName(e.target.value)}/>
       <div>E-mail:</div>
-      <Input />
+      <Input value={email} onChange={(e)=> setEmail(e.target.value)}/>
       <div>Password:</div>
-      <Input />
+      <Input type="password" value={password} onChange={(e)=> setPassword(e.target.value)}/>
       <div>Phone number:</div>
-      <Input />
-      <Button name="Register"/>
-      <button onClick={sendRequest}>
-          test
-        </button>
+      <Input value={phoneNumber} onChange={(e)=> setPhoneNumber(e.target.value)}/>
 
       <div>Gender:</div>
       <form onSubmit={sendRequest}>
@@ -114,7 +144,7 @@ export const Register = () => {
               <input
                 type="radio"
                 value="Male"
-                checked={checkGender()}
+                checked={checkGender('male')}
                 onChange={(e)=> setGender(e.target.value.toLowerCase())}
               />
               Male
@@ -179,12 +209,19 @@ export const Register = () => {
             </label>
           </div>
         </div>
-        <button className="btn btn-default" type="submit">
-          Submit
-        </button>
       </form>
-      {printHobbies()}
-      
+      <Button name="Register" onClick={sendRequest}/>
+      <table>
+        <thead>
+        <tr>
+          <th>Selected</th>
+          <th>Hobby</th>
+        </tr>
+        </thead>
+        <tbody id="tableData">
+          {printHobbies()}
+        </tbody>
+      </table>
     </div>
   )
   }

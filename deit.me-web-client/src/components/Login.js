@@ -41,8 +41,8 @@ export const Login = () => {
     return (
       <div>
         <div className="messages">
-        {errorMessage()}
-      </div>
+          {errorMessage()}
+        </div>
         <Form>
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Email address</Form.Label>

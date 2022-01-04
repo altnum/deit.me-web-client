@@ -6,8 +6,8 @@ import { useNavigate, Navigate } from "react-router-dom";
 
 
 const initialProfile = {
-    title: "Joro",
-    description: 'Joro likes motorcycles',
+    title: "Person",
+    description: 'Person\'s description',
 }
 export const BrowseCards = () => {
     const [profile, setProfile] = useState(initialProfile);
