@@ -3,6 +3,8 @@ import Input from './Input.js'
 import Button from './Button'
 import { useNavigate, Navigate } from "react-router-dom";
 import { hobbyService, userService } from './Services.js';
+import './Register.css'
+import Multiselect from 'multiselect-react-dropdown';
 
 export const Register = () => {
   const history = useNavigate();
@@ -14,47 +16,12 @@ export const Register = () => {
   const [gender, setGender] = useState('');
   const [preference, setPreference] = useState('');
   const [hobbies, setHobbies] = useState([]);
+  const [chosenHobbies, setChosenHobbies] = useState([]);
   const [error, setError] = useState(false);
-  const hobbyMap = new Map();
-  const chosenHobbies = new Map();
 
   useEffect(() => {
     getAllHobbies()    
   }, [])
-
-  const handleHobbyCheckbox = (checked) => {
-    if (!chosenHobbies.get(checked) && chosenHobbies.get(checked) !== 0) {
-      chosenHobbies.set(checked, 0)
-      return;
-    }
-    
-    chosenHobbies.set(checked, chosenHobbies.get(checked) + 1)
-    
-    if (chosenHobbies.get(checked) % 2 !== 0) {
-      chosenHobbies.delete(checked)
-    }
-  }; 
-
-  const printHobbies = () => {
-    const hobbiesDivs = [];
-    for (let i = 0; i < hobbies.length; i++) {
-      hobbyMap.set(hobbies[i].hobby, hobbies[i].id)
-      hobbiesDivs.push(
-        <tr>
-          <td><input
-          type="checkbox"
-          id="hobbie"
-          name="hobbie"
-          value={hobbies[i].hobby}
-          onChange={(e)=> handleHobbyCheckbox(e.target.value)}
-          />
-          </td>
-          <td>{hobbies[i].hobby}</td>
-        </tr>
-      )
-    }
-    return hobbiesDivs
-  }
   
   const getAllHobbies = async() => {
     var hobbiesArr = await hobbyService.getAll()
@@ -62,10 +29,9 @@ export const Register = () => {
   }
 
   const sendRequest = async() => {
-    var _hobbies = new Map;
-    console.log('request sent')
-    chosenHobbies.forEach((value, key) => {
-      _hobbies.set(hobbyMap.get(key), key)
+    var _hobbies = new Map();
+    chosenHobbies.forEach((item) => {
+      _hobbies[item.id]= item.hobby
     })
 
     var user = {
@@ -77,7 +43,6 @@ export const Register = () => {
       "preference": preference,
       "gender": gender,
       "hobbies": _hobbies
-
     }
 
     var t = await userService.register(user);
@@ -117,6 +82,14 @@ export const Register = () => {
     return false;
   }
 
+  const addHobbie = (selectedList, selectedItem) => {
+    setChosenHobbies(selectedList)
+  }
+
+  const removeHobbie = (selectedList, removedItem) => {
+    setChosenHobbies(selectedList)
+  }
+
   if (localStorage.getItem('user')) {
     return <Navigate to='/' />
   } else {
@@ -125,6 +98,7 @@ export const Register = () => {
       <div className="messages">
           {errorMessage()}
       </div>
+      <div className='formWrapper'>
       <div>First Name:</div>
       <Input value={firstName} onChange={(e)=> setFirstName(e.target.value)}/>
       <div>Last Name:</div>
@@ -135,9 +109,9 @@ export const Register = () => {
       <Input type="password" value={password} onChange={(e)=> setPassword(e.target.value)}/>
       <div>Phone number:</div>
       <Input value={phoneNumber} onChange={(e)=> setPhoneNumber(e.target.value)}/>
-
-      <div>Gender:</div>
-      <form onSubmit={sendRequest}>
+      </div>
+      <form onSubmit={sendRequest} className='radios'>
+      <div style={{ marginRight: "10px"}}><b>Gender:</b></div>
         <div className="genderRadios">
           <div className="radio">
             <label>
@@ -173,7 +147,7 @@ export const Register = () => {
             </label>
           </div>
         </div>
-        <div>Preference:</div>
+        <div style={{ marginRight: "10px" }} ><b>Preference:</b></div>
         <div className="preferenceRadios">
         <div className="radio">
             <label>
@@ -210,18 +184,17 @@ export const Register = () => {
           </div>
         </div>
       </form>
+      <Multiselect
+        options={hobbies}
+        selectedValues={chosenHobbies}
+        onSelect={addHobbie}
+        onRemove={removeHobbie}
+        displayValue="hobby"
+      />
+      <div style={{display: "flex",
+                  justifyContent: "center"}}>
       <Button name="Register" onClick={sendRequest}/>
-      <table>
-        <thead>
-        <tr>
-          <th>Selected</th>
-          <th>Hobby</th>
-        </tr>
-        </thead>
-        <tbody id="tableData">
-          {printHobbies()}
-        </tbody>
-      </table>
+      </div>
     </div>
   )
   }

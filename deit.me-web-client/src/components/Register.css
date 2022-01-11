@@ -1,0 +1,12 @@
+.formWrapper {
+    width: 100%;
+    display: inline-grid;
+    margin-top: 3%;
+    justify-content: center;
+}
+
+.radios {
+    display: flex;
+    justify-content: center;
+    margin-left: 10px;
+}

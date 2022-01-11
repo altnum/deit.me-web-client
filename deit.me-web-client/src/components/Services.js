@@ -32,9 +32,8 @@ class UserService {
     }
   }
 
-  async register(user){
+  async register(user) {
     const res = await makeRequest('/auth/signup', 'POST', user);
-    console.log(user)
     if(res) {
       return true
     } else {
@@ -46,6 +45,36 @@ class UserService {
     return localStorage.getItem('user');
   }
 
+  async browseUsers() {
+    let user = JSON.parse(localStorage.getItem('user'))
+    const res = await makeRequest('/api/browse?shouldMatchHobbies=false', 'GET', undefined, user.token)
+    if(res) {
+      return res
+    } else {
+      return false
+    }
+  }
+
+  async likeUser(token, liked) {
+    let user = JSON.parse(localStorage.getItem('user'))
+    const res = await makeRequest('/api/browse', 'POST', {token, liked}, user.token)
+    console.log(res)
+    if (res.matched == true) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  async getUser(userId) {
+    let user = JSON.parse(localStorage.getItem('user'))
+    const res = await makeRequest('/api/user?userId=' + userId, 'GET', undefined, user.token)
+    if (res) {
+      return res
+    } else {
+      return false
+    }
+  }
 }
 
 class HobbyService {

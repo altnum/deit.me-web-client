@@ -1,0 +1,18 @@
+.formWrapper{
+    width: 100%;
+    display: flex;
+    margin-top: 3%;
+    justify-content: center;
+}
+
+.logInBtn{
+    justify-content: center;
+    display: flex;
+}
+
+.redirectToSignUp{
+    justify-content: center;
+    display: flex;
+    margin-top: 1%;
+
+}
