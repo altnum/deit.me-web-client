@@ -7,7 +7,8 @@ import { userService } from './Services.js';
 
 
 const initialProfile = {
-    title: "",
+    firstName: "",
+    lastName: '',
     description: '',
     preference: '',
     hobby: []
@@ -20,14 +21,28 @@ export const BrowseCards = () => {
 
     useEffect(async()=>{
         let res = await userService.browseUsers()
+        localStorage.setItem('otherUser', JSON.stringify(res.user))
+        let _picture = await getUserPictures()
         setProfile({
-            title: res.user.firstName,
+            firstName: res.user.firstName,
+            lastName: res.user.lastName,
             description: res.user.description,
             preference: res.user.preference,
             hobby: res.user.hobby,
-            token: res.token
+            token: res.token,
+            picture: _picture
         })
     }, []);
+
+    const getUserPictures = async() => {
+        let photos = await userService.getUserPictures()
+        if (photos.length >= 1) {
+            console.log(photos[0].picture)
+            
+            return "data:image/png;base64," + photos[0].picture
+        }
+        return "https://picsum.photos/200/300"
+    }
 
     const handleClick = async (type) => {
         setClassName(type);
@@ -43,12 +58,16 @@ export const BrowseCards = () => {
             }
         }
         let res = await userService.browseUsers()
+        localStorage.setItem('otherUser', JSON.stringify(res.user))
+        let _picture = await getUserPictures()
             setProfile({
-                title: res.user.firstName,
+                firstName: res.user.firstName,
+                lastName: res.user.lastName,
                 description: res.user.description,
                 preference: res.user.preference,
                 hobby: res.user.hobby,
-                token: res.token
+                token: res.token,
+                picture: _picture
             })
     }
     if (localStorage.getItem('user')) {
@@ -56,11 +75,13 @@ export const BrowseCards = () => {
         <div className='BrowseCards'>
             <BrowseButton color={"red"} className='CardButton' type='like' handleClick={() => handleClick('liked')}/>
             <ProfileCards
-                title={profile.title}
+                firstName={profile.firstName}
+                lastName={profile.lastName}
                 className={"ProfileCard " + className}
                 description={profile.description}
                 preference={profile.preference}
                 hobbies={profile.hobby}
+                picture={profile.picture}
             />
             <BrowseButton className='CardButton' type='dislike' handleClick={() => handleClick('disliked')}/>
         </div>

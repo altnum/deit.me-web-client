@@ -15,6 +15,7 @@ export const Register = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [gender, setGender] = useState('');
   const [preference, setPreference] = useState('');
+  const [description, setDescription] = useState('');
   const [hobbies, setHobbies] = useState([]);
   const [chosenHobbies, setChosenHobbies] = useState([]);
   const [error, setError] = useState(false);
@@ -42,6 +43,7 @@ export const Register = () => {
       "phoneNumber": phoneNumber,
       "preference": preference,
       "gender": gender,
+      "description": description,
       "hobbies": _hobbies
     }
 
@@ -109,6 +111,8 @@ export const Register = () => {
       <Input type="password" value={password} onChange={(e)=> setPassword(e.target.value)}/>
       <div>Phone number:</div>
       <Input value={phoneNumber} onChange={(e)=> setPhoneNumber(e.target.value)}/>
+      <div>Description: </div>
+      <Input value={description} onChange={(e)=> setDescription(e.target.value)}/>
       </div>
       <form onSubmit={sendRequest} className='radios'>
       <div style={{ marginRight: "10px"}}><b>Gender:</b></div>

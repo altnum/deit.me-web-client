@@ -9,7 +9,6 @@ function Profile() {
     useEffect(async() => {
         let user = JSON.parse(localStorage.getItem('user'))
         let res = await userService.getUser(user.id)
-        console.log(res)
         setUser(res)
     }, [])
 

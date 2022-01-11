@@ -75,6 +75,13 @@ class UserService {
       return false
     }
   }
+
+  async getUserPictures() {
+    let user = JSON.parse(localStorage.getItem('user'))
+    let otherUser = JSON.parse(localStorage.getItem('otherUser'))
+    const res = await makeRequest('/api/user/pictures/all?userId=' + otherUser.id, 'GET', undefined, user.token)
+    return res
+  }
 }
 
 class HobbyService {
